@@ -2387,13 +2387,14 @@ static int ov8858_initialize_controls(struct ov8858 *ov8858)
 	const struct ov8858_mode *mode;
 	struct v4l2_ctrl_handler *handler;
 	struct v4l2_ctrl *ctrl;
+	struct v4l2_fwnode_device_properties props;
 	s64 exposure_max, vblank_def;
 	u32 h_blank;
 	int ret;
 
 	handler = &ov8858->ctrl_handler;
 	mode = ov8858->cur_mode;
-	ret = v4l2_ctrl_handler_init(handler, 8);
+	ret = v4l2_ctrl_handler_init(handler, 10);
 	if (ret)
 		return ret;
 	handler->lock = &ov8858->mutex;
@@ -2445,6 +2446,15 @@ static int ov8858_initialize_controls(struct ov8858 *ov8858)
 			"Failed to init controls(%d)\n", ret);
 		goto err_free_handler;
 	}
+
+	ret = v4l2_fwnode_device_parse(&ov8858->client->dev, &props);
+	if (ret)
+		goto err_free_handler;
+
+	ret = v4l2_ctrl_new_fwnode_properties(handler, &ov8858_ctrl_ops,
+					      &props);
+	if (ret)
+		goto err_free_handler;
 
 	ov8858->subdev.ctrl_handler = handler;
 
