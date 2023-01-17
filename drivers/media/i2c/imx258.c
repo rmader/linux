@@ -1499,14 +1499,6 @@ static int imx258_probe(struct i2c_client *client)
 	// but we now just configure the clock to expected value before power on
 	// if possible
 
-	/*
-	 * Check that the device is mounted upside down. The driver only
-	 * supports a single pixel order right now.
-	 */
-	ret = device_property_read_u32(&client->dev, "rotation", &val);
-	if (ret || val != 180)
-		return -EINVAL;
-
 	for (i = 0; i < IMX258_SUPPLY_COUNT; i++)
 		imx258->supplies[i].supply = imx258_supply_names[i];
 	ret = devm_regulator_bulk_get(&client->dev,
